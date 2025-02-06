@@ -75,7 +75,7 @@ threading
 Once installed, you can run the application from the command line using:
 
 ```bash
-python pktwatch.py
+sudo python pktwatch.py
 ```
 
 This will launch the Pktwatch command-line interface, where you can start and stop the sniffer, generate reports, and search alerts.
