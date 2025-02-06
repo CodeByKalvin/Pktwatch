@@ -1,4 +1,4 @@
-# Network Traffic Analyzer (CLI)
+# PktWatch - Network Traffic Analyzer (CLI)
 
 This is a command-line tool for capturing and analyzing network traffic to detect suspicious activity. It's designed for basic network monitoring and security analysis, focusing on a simple and straightforward implementation.
 
@@ -37,8 +37,8 @@ This is a command-line tool for capturing and analyzing network traffic to detec
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [repository_url]
-    cd [project_directory]
+    git clone https://github.com/CodeByKalvin/Pktwatch.git
+    cd Pktwatch
     ```
 2.  **Install Dependencies:**
     ```bash
@@ -47,9 +47,8 @@ This is a command-line tool for capturing and analyzing network traffic to detec
 3.  **Run as Root/Administrator:** The script requires elevated privileges to capture network traffic.
 
     ```bash
-    sudo python your_script_name.py
+    sudo python pktwatch.py
     ```
-    (Replace `your_script_name.py` with the actual filename)
 
 4.  **Interact with the CLI:**
     The application presents the following prompts:
