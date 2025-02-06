@@ -1,79 +1,117 @@
-# PktWatch - Network Traffic Analyzer (CLI)
+# Pktwatch
 
-This is a command-line tool for capturing and analyzing network traffic to detect suspicious activity. It's designed for basic network monitoring and security analysis, focusing on a simple and straightforward implementation.
+Pktwatch is a Python-based network security monitoring application designed to capture and analyze network traffic for suspicious activities.
 
-## Features
+This application captures network packets, analyzes them against a set of predefined attack signatures, and alerts you through logging and console output when suspicious traffic is detected.
 
-*   **Packet Capture:** Captures network traffic on a specified interface using the `scapy` library.
-*   **Context Extraction:** Extracts key information from each packet, including:
-    *   Timestamp
-    *   Source and destination IP addresses
-    *   Source and destination ports
-    *   Protocol (TCP/UDP)
-    *   User agent (when available from HTTP headers)
-*   **Signature-Based Analysis:** Detects suspicious activity using a pre-defined set of rules loaded from a JSON file. These rules include:
-    *   SQL injection patterns
-    *   Command injection patterns
-    *   Brute-force attempt keywords
-    *   Long payload thresholds
-*   **Thresholds:** Implements rate-limiting for brute-force detection by tracking login attempts per source IP within a time window.
-*   **Protocol Decoding:** Provides basic parsing for:
-    *   HTTP (identifies requests, user agent)
-    *   DNS (identifies responses)
-    *   SSH (identifies connection attempts)
-*   **Simple Filtering:** Allows filtering of alerts based on a case-insensitive string search term.
-*   **Basic Reporting:** Generates a plain text report with a summary of captured packets, generated alerts, and the list of all alerts.
-*   **Command-Line Interface (CLI):** Provides a straightforward interface for interaction.
-*   **Logging:** Saves events, alerts, and errors to a log file.
+### Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Starting and Stopping the Sniffer](#starting-and-stopping-the-sniffer)
+  - [Generating Reports](#generating-reports)
+  - [Searching Alerts](#searching-alerts)
+  - [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Important Notes](#important-notes)
+- [Contributing](#contributing)
+- [License](#license)
+- [Future Improvements](#future-improvements)
+- [Authors](#authors)
 
-## Technologies Used
+---
 
-*   **Python 3.6+:** The primary programming language.
-*   **Scapy:** For network packet capture and analysis (`pip install scapy`).
-*   **JSON:** For storing attack signatures.
-*   **Standard Libraries:**  `logging`, `re`, `time`, `collections`, `datetime`, `threading`.
+### Features
 
-## How to Use
+-   **Packet Capture:** Sniffs network packets using Scapy.
+-   **Real-time Analysis:** Analyzes captured packets in real-time against attack signatures.
+-   **Attack Detection:** Detects common attack patterns like SQL injection, command injection, brute force attempts, and long payloads.
+-   **Logging:** Logs suspicious activity with relevant context (timestamp, protocol, source/destination IP/port).
+-   **Reporting:** Generates reports summarizing captured traffic and alerts.
+-   **Alert Searching:** Allows searching for specific alerts based on keywords.
+-   **Configurable Rules:** Attack signatures are defined in a JSON file, allowing easy customization and extension.
+-   **Brute-Force Detection:** Tracks login attempts and flags potential brute-force attacks based on configurable thresholds.
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/CodeByKalvin/Pktwatch.git
-    cd Pktwatch
-    ```
-2.  **Install Dependencies:**
-    ```bash
-    pip install scapy
-    ```
-3.  **Run as Root/Administrator:** The script requires elevated privileges to capture network traffic.
+---
 
-    ```bash
-    sudo python pktwatch.py
-    ```
+### Installation
 
-4.  **Interact with the CLI:**
-    The application presents the following prompts:
-    *   `start`: Start capturing and analyzing network traffic.
-    *   `stop`: Stop capturing network traffic.
-    *   `search`: Search alerts by case-insensitive string.
-    *   `report`: Generate a basic report.
-    *   `exit`: Stop and exit the application.
+To run Pktwatch locally, follow these steps:
 
-5.  **Check the output:**
-    *   Alert messages will be shown on the console.
-    *   Detailed log messages will be saved in `suspicious_traffic.log`.
-    *   Reports will be saved in `traffic_report.txt`
+#### 1. Clone the Repository
 
-## Configuration
+```bash
+git clone https://github.com/CodeByKalvin/Pktwatch.git 
+cd Pktwatch
+```
+
+#### 2. Install Dependencies
+
+Make sure you have **Python 3** installed. Install the required dependencies using `pip`:
+
+```bash
+pip install -r requirements.txt
+```
+
+The `requirements.txt` should contain the following (or similar):
+
+```txt
+scapy
+logging
+re
+time
+json
+collections
+datetime
+threading
+```
+
+**Important:**  Scapy might require additional steps depending on your operating system. Refer to the Scapy documentation for installation instructions.
+---
+
+### Usage
+
+Once installed, you can run the application from the command line using:
+
+```bash
+python pktwatch.py
+```
+
+This will launch the Pktwatch command-line interface, where you can start and stop the sniffer, generate reports, and search alerts.
+
+---
+
+#### Starting and Stopping the Sniffer
+
+-   Enter `start` to start the network sniffer. This will begin capturing and analyzing network traffic.
+-   Enter `stop` to stop the network sniffer.
+
+---
+
+#### Generating Reports
+
+-   Enter `report` to generate a report of the captured traffic and alerts. The report will be saved to the `traffic_report.txt` file.
+
+---
+
+#### Searching Alerts
+
+-   Enter `search` to search for specific alerts. You will be prompted to enter a search term.  The tool will then display any alerts containing that term in the message.
+
+---
+
+#### Configuration
 
 The application is configured via a few global variables at the beginning of the Python script and an attack rules file `attack_rules.json`:
 
 *   `INTERFACE`: The network interface to sniff (e.g., "eth0", "wlan0").
 *   `FILTER`: The scapy filter string (e.g., "tcp or udp").
-*   `LOG_FILE`: Name of the log file (default: "suspicious_traffic.log").
+*   `LOG_FILE`: Name of the log file (default: "suspicious.log").
 *   `RULE_FILE`:  Name of the attack rules file (default: "attack_rules.json")
 *   `REPORT_FILE`:  Name of the report file (default "traffic_report.txt").
-*   `MAX_LOGIN_ATTEMPTS`: Maximum login attempts within a given time period.
-*   `LOGIN_ATTEMPT_WINDOW`: The time window (in seconds) for brute-force detection.
+*   `MAX_LOGIN_FAILS`: Maximum login attempts within a given time period.
+*   `LOGIN_WINDOW`: The time window (in seconds) for brute-force detection.
 
 The `attack_rules.json` file defines the attack patterns. Example:
 
@@ -88,14 +126,14 @@ The `attack_rules.json` file defines the attack patterns. Example:
       "information_schema",
       ";"
     ],
-  "command_injection": [
+  "cmd_injection": [
       "\\|",
       ";",
       "`",
       "\\$\\(",
       "sh\\s+-c"
     ],
-   "brute_force_keywords": [
+   "brute_force": [
       "login",
       "failed|invalid|incorrect",
       "password"
@@ -104,36 +142,83 @@ The `attack_rules.json` file defines the attack patterns. Example:
      "threshold": 4000
     }
 }
+```
+
+**Important:** When defining regular expressions in `attack_rules.json`, remember to escape special characters appropriately (e.g., `\` for backslash).
+
+---
+
+### Project Structure
 
 ```
+Pktwatch/
+│
+├── pktwatch.py          # Main Python script
+├── README.md            # This README file
+├── requirements.txt     # List of dependencies
+├── attack_rules.json    # Attack rule configuration file
+├── suspicious.log       # Log file for suspicious activity
+└── traffic_report.txt   # Report file for traffic analysis
+```
+
+---
+
+### Requirements
+
+-   **Python 3** or higher
+-   **Pip** to install dependencies
+-   **Scapy:**  For packet capture and analysis.
+-   **Regular Expression (re):** Used for matching attack signatures.
+-   **Other standard Python Libraries:** logging, time, json, collections, datetime, threading.  These are typically included with Python.
+
+To install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
 ## Important Notes
 
-    Run as Root/Administrator: Capturing network packets requires elevated privileges.
+-   **Run as Root/Administrator:** Capturing network packets requires elevated privileges.  You typically need to run the script with `sudo` on Linux/macOS.
+-   **Responsibility:** Use this tool responsibly and only on networks where you have permission to analyze traffic.
+-   **False Positives:** The tool may generate false positives. Adjust attack rules for your needs.
+-   **Security Disclaimer:** This tool is not a complete or professional-grade security solution. It's a basic tool to explore network analysis.
 
-    Responsibility: Use this tool responsibly and only on networks where you have permission to analyze traffic.
+### Contributing
 
-    False Positives: The tool may generate false positives. Adjust attack rules for your needs.
+If you want to contribute to this project, feel free to submit a pull request or create an issue with a detailed description of the feature or bug you're addressing.
 
-    Security Disclaimer: This tool is not a complete or professional-grade security solution. It's a basic tool to explore network analysis.
+#### Steps to Contribute:
 
-## Further Development
+1.  Fork the repository.
+2.  Create a new branch for your feature (`git checkout -b feature-name`).
+3.  Make your changes.
+4.  Test your changes.
+5.  Commit your changes (`git commit -m 'Add some feature'`).
+6.  Push to your branch (`git push origin feature-name`).
+7.  Create a pull request.
 
-Future enhancements could include:
+---
 
-    More complex filtering logic.
+### Future Improvements
 
-    More detailed and customizable reports.
+-   Implement more sophisticated attack detection techniques.
+-   Add support for different output formats (e.g., JSON, CSV).
+-   Enhance reporting capabilities with more detailed statistics.
+-   Develop a graphical user interface (GUI).
+-   Add the ability to save captured packets to a PCAP file.
+-   Improve documentation and add more example attack signatures.
 
-    An interactive command-line interface using a library like prompt_toolkit.
+---
 
-    Expanding protocol decoding with support for more protocols.
+### License
 
-    A more robust and flexible rule format, with support for multiple thresholds or rules.
+This project is open-source and available under the [MIT License](LICENSE).
 
-## Contributing
+---
 
-Feel free to contribute by forking the repository and submitting pull requests.
+### Authors
 
-## License
-
-Mit License
+-   **CodeByKalvin** - *Initial work* - [GitHub Profile](https://github.com/codebykalvin)
