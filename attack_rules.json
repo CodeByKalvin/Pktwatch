@@ -1,0 +1,26 @@
+{
+  "sql_injection": [
+      "'.*?--",
+      "union\\s+select",
+      "exec\\(",
+      "\\s+or\\s+\\d+\\s*=\\s*\\d+",
+      "\\s+and\\s+1=1",
+      "information_schema",
+      ";"
+    ],
+  "command_injection": [
+      "\\|",
+      ";",
+      "`",
+      "\\$\\(",
+      "sh\\s+-c"
+    ],
+   "brute_force_keywords": [
+      "login",
+      "failed|invalid|incorrect",
+      "password"
+    ],
+   "long_payload": {
+     "threshold": 4000
+    }
+}
